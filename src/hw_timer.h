@@ -40,9 +40,10 @@ void hw_disable(void);
 
 /* One channel measurement using the hardware backend. `burst` is the read burst
  * in carrier periods; `read_burst` overrides it when non-zero (per-read
- * steady-state ramp probe). settle[] is A/B/C/D in microseconds. */
+ * steady-state ramp probe). settle_cyc[4] is A/B/C/D in DWT cycles (72 cycles =
+ * 1 us), so the settle can be tuned sub-microsecond. */
 uint16_t hw_measure(uint16_t mask_b, uint16_t val_c, uint8_t burst, uint8_t adc_n,
-                    const uint8_t settle[4], uint8_t recovery,
+                    const uint16_t settle_cyc[4], uint8_t recovery,
                     uint16_t read_burst);
 
 /* Explicit prime on one 1-based coil: `repeats` back-to-back bursts of

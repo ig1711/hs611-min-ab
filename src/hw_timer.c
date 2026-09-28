@@ -397,7 +397,7 @@ void hw_disable(void)
 }
 
 uint16_t hw_measure(uint16_t mask_b, uint16_t val_c, uint8_t burst, uint8_t adc_n,
-                    const uint8_t settle[4], uint8_t recovery, uint16_t read_burst)
+                    const uint16_t settle_cyc[4], uint8_t recovery, uint16_t read_burst)
 {
     uint16_t v;
     uint16_t n;
@@ -422,15 +422,17 @@ uint16_t hw_measure(uint16_t mask_b, uint16_t val_c, uint8_t burst, uint8_t adc_
     carrier_burst_n(n);
     drive_gpio_idle();                                 /* safe idle after burst */
 
-    dwt_delay_us(settle[0]);
-    if (settle[1] != 0U) {
-        dwt_delay_us(settle[1]);
+    if (settle_cyc[0] != 0U) {
+        dwt_delay_cycles(settle_cyc[0]);
+    }
+    if (settle_cyc[1] != 0U) {
+        dwt_delay_cycles(settle_cyc[1]);
     }
 
     REG32(GPIOA_BASE + 0x28U) = PIN_PA4;               /* PA4 low: sample */
 
-    if (settle[2] != 0U) {
-        dwt_delay_us(settle[2]);
+    if (settle_cyc[2] != 0U) {
+        dwt_delay_cycles(settle_cyc[2]);
     }
 
     adc_sample();
@@ -441,8 +443,8 @@ uint16_t hw_measure(uint16_t mask_b, uint16_t val_c, uint8_t burst, uint8_t adc_
 
     carrier_stop();
 
-    if (recovery != 0U) {
-        dwt_delay_us(settle[3]);
+    if (recovery != 0U && settle_cyc[3] != 0U) {
+        dwt_delay_cycles(settle_cyc[3]);
     }
 
     if (primask == 0U) {

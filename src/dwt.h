@@ -21,12 +21,16 @@ static inline void dwt_init(void)
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
-static inline void dwt_delay_us(uint32_t us)
+static inline void dwt_delay_cycles(uint32_t cycles)
 {
     uint32_t start = DWT->CYCCNT;
-    uint32_t cycles = us * DWT_CYCLES_PER_US;
     while ((DWT->CYCCNT - start) < cycles) {
     }
+}
+
+static inline void dwt_delay_us(uint32_t us)
+{
+    dwt_delay_cycles(us * DWT_CYCLES_PER_US);
 }
 
 static inline uint32_t dwt_now_us(void)

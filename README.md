@@ -5,12 +5,12 @@ pen tablet**, using the vendor-class USB transport so a host tool can stream
 live coil amplitudes and change every acquisition setting on the fly.
 
 It is the isolated, cleaned-up, documented descendant of the `DEBUG_MIN` build
-from the [hs611-fw](../hs611-fw) project. Only the A/B firmware is here: no
-release/HID code, no heat-map/DEBUG_DUMP code, one build target, one protocol.
+from the `hs611-fw` project. Only the A/B firmware is here: no release/HID code,
+no heat-map/DEBUG_DUMP code, one build target, one protocol.
 
-The companion host tool is [tablet-ab](../tablet-ab). Its
-[`docs/protocol.md`](../tablet-ab/docs/protocol.md) is the canonical wire
-reference.
+The companion host tool is [tablet-ab](https://github.com/ig1711/tablet-ab). Its
+[`docs/protocol.md`](https://github.com/ig1711/tablet-ab/blob/main/docs/protocol.md)
+is the canonical wire reference.
 
 ## What it does
 
@@ -50,9 +50,10 @@ bootloader (`28e9:0189`); the tablet enumerates as `256c:6111` once the app
 runs. `dfu-util` does **not** work with this bootloader; `tools/flash.py` talks
 to the DFU class interface directly.
 
-Then connect with [tablet-ab](../tablet-ab) (see its `docs/usb-setup.md` for
-Linux udev / Windows WinUSB setup) or any host that speaks the protocol in
-[`docs/protocol.md`](../tablet-ab/docs/protocol.md).
+Then connect with [tablet-ab](https://github.com/ig1711/tablet-ab) (see its
+[`docs/usb-setup.md`](https://github.com/ig1711/tablet-ab/blob/main/docs/usb-setup.md)
+for Linux udev / Windows WinUSB setup) or any host that speaks the protocol in
+[`docs/protocol.md`](https://github.com/ig1711/tablet-ab/blob/main/docs/protocol.md).
 
 ## Source layout
 

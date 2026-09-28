@@ -12,7 +12,7 @@ static uint8_t  g_backend = ACQ_BACKEND_HW;
 static uint8_t  g_freq = ACQ_DEFAULT_FREQ;
 static uint16_t g_freq_arr;                  /* 0 = use the freq index table */
 static uint8_t  g_burst = ACQ_DEFAULT_BURST;
-static uint8_t  g_settle[4] = { 2U, 1U, 6U, 4U };
+static uint16_t g_settle_cyc[4] = { 144U, 72U, 432U, 288U };  /* 2/1/6/4 us */
 static uint8_t  g_adc_n = ACQ_DEFAULT_ADC_N;
 static uint8_t  g_adc_clk = ACQ_DEFAULT_ADC_CLK;
 static uint8_t  g_recovery;
@@ -40,10 +40,10 @@ void acq_init(void)
 uint16_t acq_measure(uint16_t mask_b, uint16_t val_c)
 {
     if (g_backend == ACQ_BACKEND_HW) {
-        return hw_measure(mask_b, val_c, g_burst, g_adc_n, g_settle, g_recovery,
+        return hw_measure(mask_b, val_c, g_burst, g_adc_n, g_settle_cyc, g_recovery,
                           g_read_burst);
     }
-    return afe_measure_sw(mask_b, val_c, g_freq);
+    return afe_measure_sw(mask_b, val_c, g_freq, g_settle_cyc);
 }
 
 void acq_scan_table(uint8_t n, const uint8_t *table, uint16_t *out, uint8_t desc)
@@ -126,12 +126,34 @@ void acq_set_burst(uint8_t periods)
     g_burst = periods;
 }
 
+static uint16_t us_to_cycles(uint8_t us)
+{
+    uint32_t c = (uint32_t)us * 72U;
+    return (uint16_t)((c > 65535U) ? 65535U : c);
+}
+
 void acq_set_settle(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {
-    g_settle[0] = a;
-    g_settle[1] = b;
-    g_settle[2] = c;
-    g_settle[3] = d;
+    /* Microsecond convenience: 1 us = 72 DWT cycles. */
+    g_settle_cyc[0] = us_to_cycles(a);
+    g_settle_cyc[1] = us_to_cycles(b);
+    g_settle_cyc[2] = us_to_cycles(c);
+    g_settle_cyc[3] = us_to_cycles(d);
+}
+
+void acq_set_settle_cycles(uint8_t site, uint16_t cycles)
+{
+    if (site < 4U) {
+        g_settle_cyc[site] = cycles;
+    }
+}
+
+void acq_set_settle_cycles_all(uint16_t a, uint16_t b, uint16_t c, uint16_t d)
+{
+    g_settle_cyc[0] = a;
+    g_settle_cyc[1] = b;
+    g_settle_cyc[2] = c;
+    g_settle_cyc[3] = d;
 }
 
 void acq_set_adc(uint8_t n, uint8_t clk)

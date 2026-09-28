@@ -217,6 +217,10 @@ static void apply_command(const uint8_t *b)
     case PROTO_CMD_REPEAT_COIL:
         scan_set_repeat_coil(b[1]);
         break;
+    case PROTO_CMD_SET_SETTLE_CYC:
+        acq_set_settle_cycles_all(get_u16(b, 1U), get_u16(b, 3U),
+                                  get_u16(b, 5U), get_u16(b, 7U));
+        break;
     default:
         break;
     }

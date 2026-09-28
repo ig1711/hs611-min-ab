@@ -72,7 +72,8 @@ VID/PID so the host tool does not confuse your tablet with the HS611, update:
 therefore `PROTO_FRAME_LEN`. Changing them is a **protocol break**: the host's
 `ProtocolConstants` (frame length, header offset of the Y profile) must be
 updated in lock-step. Prefer keeping the HS611 counts if you can, or bump the
-protocol version and document the new layout in `tablet-ab/docs/protocol.md`.
+protocol version and document the new layout in tablet-ab's
+[`docs/protocol.md`](https://github.com/ig1711/tablet-ab/blob/main/docs/protocol.md).
 
 ## 7. Check it
 

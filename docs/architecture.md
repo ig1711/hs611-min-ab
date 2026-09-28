@@ -149,8 +149,14 @@ on the selected mode:
 
 ## Timing
 
-- `dwt.h` provides `dwt_delay_us()` and `dwt_now_us()`. All software delays and
-  the frame's device timestamp use the DWT cycle counter (72 cycles/µs).
+- `dwt.h` provides `dwt_delay_us()`, `dwt_delay_cycles()` and `dwt_now_us()`.
+  All software delays and the frame's device timestamp use the DWT cycle counter
+  (72 cycles/µs).
+- Settle sites A/B/C/D are stored as **DWT cycles** (`acq_set_settle_cycles`),
+  so the host can tune them sub-microsecond. `SET_SETTLE` (0x06) writes whole
+  microseconds (×72) as a convenience; `SET_SETTLE_CYC` (0x15) writes raw
+  cycles. This matters because settle C samples the tank ring-down (~1.9 µs
+  period at frequency index 6), so whole-µs steps alias it.
 - The frame's `scan_us` is measured around the pure scan, so the host can
   separate device acquisition time from host-side frame period.
 - Pacing: by default one acquisition per USB start-of-frame (1 ms). Continuous
@@ -160,5 +166,6 @@ on the selected mode:
 
 ## Wire protocol
 
-See [`docs/protocol.md`](../tablet-ab/docs/protocol.md) (canonical) and
-`src/protocol.h`. Version 6: a 168-byte frame and 64-byte commands.
+See [`docs/protocol.md`](https://github.com/ig1711/tablet-ab/blob/main/docs/protocol.md)
+(canonical) and `src/protocol.h`. Version 6: a 168-byte frame and 64-byte
+commands.

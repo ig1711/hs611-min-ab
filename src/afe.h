@@ -17,7 +17,9 @@ void afe_init(void);
 /* Select the receive loop described by a coil-table entry. */
 void afe_mux(uint16_t mask_b, uint16_t val_c);
 
-/* One complete measurement on the software backend. */
-uint16_t afe_measure_sw(uint16_t mask_b, uint16_t val_c, uint8_t freq);
+/* One complete measurement on the software backend. settle_cyc[4] is A/B/C/D in
+ * DWT cycles (72 = 1 us). */
+uint16_t afe_measure_sw(uint16_t mask_b, uint16_t val_c, uint8_t freq,
+                        const uint16_t settle_cyc[4]);
 
 #endif /* MIN_AFE_H */

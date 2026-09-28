@@ -38,7 +38,9 @@ uint8_t acq_get_backend(void);
 void acq_set_freq(uint8_t freq);                  /* 1..12, clears raw override */
 void acq_set_freq_arr(uint16_t arr);              /* 0 = index table */
 void acq_set_burst(uint8_t periods);              /* 6..32 */
-void acq_set_settle(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+void acq_set_settle(uint8_t a, uint8_t b, uint8_t c, uint8_t d);   /* microseconds */
+void acq_set_settle_cycles(uint8_t site, uint16_t cycles);         /* 0=A 1=B 2=C 3=D */
+void acq_set_settle_cycles_all(uint16_t a, uint16_t b, uint16_t c, uint16_t d);
 void acq_set_adc(uint8_t n, uint8_t clk);         /* n 1..7, clk 0..3 */
 void acq_set_recovery(uint8_t on);                /* 0/1 */
 

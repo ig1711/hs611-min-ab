@@ -65,6 +65,10 @@
  *   0x12 SET_WARMUP      [1]=0..8 discarded reads before each axis scan
  *   0x13 SET_FLAT_TOL    [1..2]=u16 flat-top hold tolerance (0 = off)
  *   0x14 REPEAT_COIL     [1]=0 off, 1..41 repeat that axis-B coil
+ *   0x15 SET_SETTLE_CYC  [1..2]=A [3..4]=B [5..6]=C [7..8]=D, each a u16 LE
+ *                        settle in DWT cycles (72 cycles = 1 us). Lets the
+ *                        settle be tuned sub-microsecond; SET_SETTLE (0x06, in
+ *                        microseconds) remains and the last one written wins.
  *
  * Pacing modes: 0 SOF (one acquisition per USB frame), 1 continuous (free-run),
  * 2 auto (free-run only while the carry-over ramp mode is set).
@@ -184,5 +188,6 @@
 #define PROTO_CMD_SET_WARMUP     0x12U
 #define PROTO_CMD_SET_FLAT_TOL   0x13U
 #define PROTO_CMD_REPEAT_COIL    0x14U
+#define PROTO_CMD_SET_SETTLE_CYC 0x15U
 
 #endif /* MIN_PROTOCOL_H */

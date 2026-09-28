@@ -31,14 +31,10 @@
 #define ADC0_RSQ2       REG32(ADC0_BASE + 0x34U)
 #define ADC0_RDATA      REG32(ADC0_BASE + 0x4CU)
 
-/* Software-backend settle times (microseconds). The stock vendor values were
- * 30/20/45/150; these reduced values were validated on the HS611 hardware. The
- * pre-amp settle (C) is the important one: too long and adjacent-coil
- * differences collapse, too short and the sample is still slewing. */
-#define SETTLE_A_US     2U
-#define SETTLE_B_US     1U
-#define SETTLE_C_US     6U
-#define SETTLE_D_US     4U
+/* Settle times are supplied by acq.c as DWT cycles (72 = 1 us); the host can
+ * tune them sub-microsecond. The pre-amp settle (C) is the important one: too
+ * long and adjacent-coil differences collapse, too short and the sample is
+ * still slewing. */
 
 /* ---- low level GPIO ----------------------------------------------------- */
 static inline void gpio_mode(uint32_t base, uint32_t moder, uint32_t pupd, uint32_t mask)
@@ -245,26 +241,32 @@ static uint16_t median3(uint16_t a, uint16_t b, uint16_t c)
     return b;
 }
 
-/* FUN_08004f74: settle, pulse PA4, 3 conversions, median. */
-static uint16_t adc_median6(uint8_t mode)
+/* FUN_08004f74: settle, pulse PA4, 3 conversions, median.
+ * Settles are DWT cycles (72 = 1 us) so the host can tune them sub-microsecond.
+ * mode 2 adds settle B, mode 1 adds settle D (coil recovery). */
+static uint16_t adc_median6(uint8_t mode, const uint16_t settle_cyc[4])
 {
     uint16_t v0, v1, v2, med;
 
     adc_config(6U, 5U);
-    dwt_delay_us(SETTLE_A_US);
-    if (mode == 2U) {
-        dwt_delay_us(SETTLE_B_US);
+    if (settle_cyc[0] != 0U) {
+        dwt_delay_cycles(settle_cyc[0]);
+    }
+    if (mode == 2U && settle_cyc[1] != 0U) {
+        dwt_delay_cycles(settle_cyc[1]);
     }
     gpio_brr(GPIOA_BASE, PIN_PA4);                       /* PA4 low: sample */
-    dwt_delay_us(SETTLE_C_US);                           /* pre-amp settle */
+    if (settle_cyc[2] != 0U) {
+        dwt_delay_cycles(settle_cyc[2]);                 /* pre-amp settle */
+    }
     v0 = adc_read(6U, 5U);
     v1 = adc_read(6U, 5U);
     v2 = adc_read(6U, 5U);
     med = median3(v0, v1, v2);
     gpio_bsrr(GPIOA_BASE, PIN_PA4);                      /* PA4 high: hold */
     REG32(GPIOB_BASE + 0x14U) |= MUX_B_IDLE_MASK;        /* restore mux idle */
-    if (mode == 1U) {
-        dwt_delay_us(SETTLE_D_US);                       /* coil recovery */
+    if (mode == 1U && settle_cyc[3] != 0U) {
+        dwt_delay_cycles(settle_cyc[3]);                 /* coil recovery */
     }
     return med;
 }
@@ -350,7 +352,8 @@ void afe_init(void)
     afe_gpio_init();
 }
 
-uint16_t afe_measure_sw(uint16_t mask_b, uint16_t val_c, uint8_t freq)
+uint16_t afe_measure_sw(uint16_t mask_b, uint16_t val_c, uint8_t freq,
+                        const uint16_t settle_cyc[4])
 {
     uint16_t v;
     uint32_t primask = __get_PRIMASK();
@@ -358,7 +361,7 @@ uint16_t afe_measure_sw(uint16_t mask_b, uint16_t val_c, uint8_t freq)
 
     afe_mux(mask_b, val_c);
     excite(freq);
-    v = adc_median6(0U);
+    v = adc_median6(0U, settle_cyc);
 
     if (primask == 0U) {
         __enable_irq();
