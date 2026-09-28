@@ -1,14 +1,15 @@
 /*
- * protocol.h — hs611-min-ab WebUSB A/B protocol, version 6.
+ * protocol.h — hs611-min-ab WebUSB A/B protocol, version 7.
  *
  * The device enumerates as a vendor-class bulk device (256c:6111) with a bulk IN
  * for frames and a bulk OUT for commands. Frames are fixed-length; commands are
  * exactly 64 bytes, zero padded. Everything is little-endian.
  *
- * Frame, 168 bytes:
+ * Frame, 172 bytes (v7 adds a self-describing geometry block at 32..35; offsets
+ * 0..31 are identical to v6):
  *   off  size  field
  *   0    2     magic 'H','S'
- *   2    1     version (6)
+ *   2    1     version (7)
  *   3    1     seq (wraps)
  *   4    2     flags (PROTO_FLAG_*)
  *   6    1     backend (PROTO_BACKEND_*)
@@ -29,8 +30,11 @@
  *   23   1     y peak loop (1..27, 0 = none)
  *   24   4     device time, microseconds (wraps ~59.6 s)
  *   28   4     scan duration, microseconds
- *   32   82    x amplitude[41] (axis-B loops, u16 each)
- *   114  54    y amplitude[27] (axis-A loops, u16 each)
+ *   32   1     nx (41, x profile length)
+ *   33   1     ny (27, y profile length)
+ *   34   2     reserved (0)
+ *   36   82    x amplitude[41] (axis-B loops, u16 each)
+ *   118  54    y amplitude[27] (axis-A loops, u16 each)
  *
  * Command (host -> device, exactly 64 bytes, zero padded); [0] is the opcode:
  *   0x01 PING            device replies with a frame
@@ -81,12 +85,12 @@
 
 #define PROTO_MAGIC0        0x48U   /* 'H' */
 #define PROTO_MAGIC1        0x53U   /* 'S' */
-#define PROTO_VERSION       0x06U
+#define PROTO_VERSION       0x07U
 
 #define PROTO_NX            41U
 #define PROTO_NY            27U
-#define PROTO_HEADER_LEN    32U
-#define PROTO_FRAME_LEN     (PROTO_HEADER_LEN + PROTO_NX * 2U + PROTO_NY * 2U)   /* 168 */
+#define PROTO_HEADER_LEN    36U
+#define PROTO_FRAME_LEN     (PROTO_HEADER_LEN + PROTO_NX * 2U + PROTO_NY * 2U)   /* 172 */
 #define PROTO_CMD_LEN       64U
 
 /* Near threshold: a peak above it means the pen is coupling. */
@@ -116,7 +120,9 @@
 #define PROTO_OFF_PEAK_Y    23U
 #define PROTO_OFF_TIME_US   24U
 #define PROTO_OFF_SCAN_US   28U
-#define PROTO_OFF_AMP_X     32U
+#define PROTO_OFF_NX        32U
+#define PROTO_OFF_NY        33U
+#define PROTO_OFF_AMP_X     36U
 #define PROTO_OFF_AMP_Y     (PROTO_OFF_AMP_X + PROTO_NX * 2U)
 
 /* Frame flags. */

@@ -44,8 +44,10 @@ and an ADC read. Two backends produce the same number so they can be A/B'd:
 A faithful port of the vendor bit-banged path:
 
 1. `afe_mux()` selects the loop.
-2. `excite(freq)` emits a 29-period drive burst with inline-asm `DRIVE_BURST`
-   NOP sleds (PA5 gate, PB10 carrier), wrapped in an interrupt lock.
+2. `excite(freq)` emits a drive burst of `SW_BURST_PERIODS` carrier periods
+   (compile-time, default 29; `make SW_BURST=<6..32>`) with inline-asm
+   `DRIVE_BURST` NOP sleds (PA5 gate, PB10 carrier), wrapped in an interrupt
+   lock. The protocol's `SET_BURST` affects only the hardware backend.
 3. Three software-triggered ADC conversions on channel 6 are median-filtered
    (`adc_median6`) after the settle times A/B/C/D.
 
@@ -167,5 +169,5 @@ on the selected mode:
 ## Wire protocol
 
 See [`docs/protocol.md`](https://github.com/ig1711/tablet-ab/blob/main/docs/protocol.md)
-(canonical) and `src/protocol.h`. Version 6: a 168-byte frame and 64-byte
-commands.
+(canonical) and `src/protocol.h`. Version 7: a 172-byte frame (a self-describing
+nx/ny geometry block at offsets 32..35) and 64-byte commands.

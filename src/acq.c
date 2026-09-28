@@ -195,7 +195,10 @@ void acq_set_prime(uint8_t periods, uint8_t repeats)
 }
 
 uint8_t acq_get_freq(void)     { return g_freq; }
-uint8_t acq_get_burst(void)    { return g_burst; }
+uint8_t acq_get_burst(void)
+{
+    return (g_backend == ACQ_BACKEND_HW) ? g_burst : (uint8_t)SW_BURST_PERIODS;
+}
 uint8_t acq_get_adc_n(void)    { return g_adc_n; }
 uint8_t acq_get_adc_clk(void)  { return g_adc_clk; }
 uint8_t acq_get_recovery(void) { return g_recovery; }

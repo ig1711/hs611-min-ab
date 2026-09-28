@@ -283,11 +283,15 @@ void afe_mux(uint16_t mask_b, uint16_t val_c)
 #define GPIOB_BSRR_ADDR  0x48000418U
 
 /* 29 carrier periods, each a low/high half with N1/N2 NOPs. The burst is inline
- * asm with .rept so every sled entry is a real 1-cycle NOP. */
+ * asm with .rept so every sled entry is a real 1-cycle NOP. The period count is
+ * compile-time (SW_BURST_PERIODS, board.h); the A/B panel's burst control is
+ * hardware-only. */
+#define SW_BURST_STR_(x) #x
+#define SW_BURST_STR(x)  SW_BURST_STR_(x)
 #define DRIVE_BURST(n1, n2)                                                   \
     do {                                                                      \
         __asm__ volatile(                                                     \
-            "movs r4, #29\n"                                                  \
+            "movs r4, #" SW_BURST_STR(SW_BURST_PERIODS) "\n"                  \
             "1:\n\t"                                                          \
             "mov.w r0, #0x400\n\t"                                            \
             "str r0, [%0]\n\t"                                                \

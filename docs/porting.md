@@ -47,7 +47,9 @@ then bake the winners into the table. Widths/duty and the safe clamp
 
 The software backend (`afe.c`) has its own NOP-sled burst (`DRIVE_BURST`) with a
 per-frequency `(n1, n2)` table; update those to match the same band if you want
-the software baseline to be meaningful.
+the software baseline to be meaningful. Its period count is compile-time
+(`SW_BURST_PERIODS`, default 29; build with `make SW_BURST=<6..32>`); the
+protocol's `SET_BURST` affects only the hardware backend.
 
 ## 4. Linker script and bootloader
 

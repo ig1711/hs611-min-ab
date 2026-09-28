@@ -13,7 +13,7 @@ is the canonical wire reference.
 - Enumerates as a vendor-class USB device (`256c:6111`), bulk IN for frames and
   bulk OUT for commands.
 - Drives the tablet's receive-coil mux and reads the coupled amplitude of each
-  loop, streaming a fixed 168-byte frame per acquisition: the whole 41-coil X
+  loop, streaming a fixed 172-byte frame per acquisition: the whole 41-coil X
   profile, the whole 27-coil Y profile, the device-computed sub-pixel position,
   and a config/telemetry echo.
 - Lets the host change, at run time, the timing backend, carrier frequency,
@@ -38,8 +38,13 @@ Requires `arm-none-eabi-gcc` and (for flashing) `uv` + a USB DFU connection.
 ```sh
 make                # build/app.elf, build/app.bin, build/app.hex
 make size           # footprint
+make SW_BURST=24    # build with 24 software NOP-sled carrier periods
 make flash          # DFU-write build/app.bin at 0x08004000, verify
 ```
+
+The software backend's NOP-sled burst length is fixed at build time
+(`SW_BURST_PERIODS`, default 29; `make SW_BURST=<6..32>`). The protocol's
+`SET_BURST` command only affects the hardware-timed backend.
 
 Hold the tablet button (PA1) while plugging USB in to enter the vendor DFU
 bootloader (`28e9:0189`); the tablet enumerates as `256c:6111` once the app

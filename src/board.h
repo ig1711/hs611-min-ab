@@ -56,4 +56,13 @@
 #define PRIME_MIN           6U
 #define PRIME_MAX           255U
 
+/* Software NOP-sled carrier periods (compile-time; the A/B panel's burst
+ * control is hardware-only). Build with -DSW_BURST_PERIODS=<n> or make SW_BURST=<n>. */
+#ifndef SW_BURST_PERIODS
+#define SW_BURST_PERIODS 29U
+#endif
+#if (SW_BURST_PERIODS < 6U) || (SW_BURST_PERIODS > 32U)
+#error "SW_BURST_PERIODS must be 6..32 (matches BURST_MIN..BURST_MAX)"
+#endif
+
 #endif /* MIN_BOARD_H */

@@ -608,6 +608,8 @@ static void build_frame(uint8_t *tx)
     tx[PROTO_OFF_MAGIC1]    = PROTO_MAGIC1;
     tx[PROTO_OFF_VERSION]   = PROTO_VERSION;
     tx[PROTO_OFF_SEQ]       = 0U;                       /* transport rewrites */
+    tx[PROTO_OFF_NX]        = (uint8_t)PROTO_NX;
+    tx[PROTO_OFF_NY]        = (uint8_t)PROTO_NY;
     put16(&tx[PROTO_OFF_FLAGS], frame_flags(amax_b, amax_a));
     tx[PROTO_OFF_BACKEND]   = backend;
     tx[PROTO_OFF_ESTIMATOR] = estimator_get();

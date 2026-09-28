@@ -15,7 +15,10 @@ CC       := $(CROSS)gcc
 OBJCOPY  := $(CROSS)objcopy
 SIZE     := $(CROSS)size
 
-DEFS     := -DGD32F350 -DUSE_STDPERIPH_DRIVER -DHXTAL_VALUE=12000000U
+SW_BURST ?= 29
+
+DEFS     := -DGD32F350 -DUSE_STDPERIPH_DRIVER -DHXTAL_VALUE=12000000U \
+            -DSW_BURST_PERIODS=$(SW_BURST)
 
 CPU      := -mcpu=cortex-m4 -mthumb -mfloat-abi=soft
 OPT      := -Og -g3
