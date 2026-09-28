@@ -4,10 +4,6 @@ A small, self-contained firmware for **A/B testing coil acquisition on a
 pen tablet**, using the vendor-class USB transport so a host tool can stream
 live coil amplitudes and change every acquisition setting on the fly.
 
-It is the isolated, cleaned-up, documented descendant of the `DEBUG_MIN` build
-from the `hs611-fw` project. Only the A/B firmware is here: no release/HID code,
-no heat-map/DEBUG_DUMP code, one build target, one protocol.
-
 The companion host tool is [tablet-ab](https://github.com/ig1711/tablet-ab). Its
 [`docs/protocol.md`](https://github.com/ig1711/tablet-ab/blob/main/docs/protocol.md)
 is the canonical wire reference.
@@ -82,12 +78,3 @@ used for the drive carrier and mux, the receive-loop count and mux tables, and
 the carrier-period table. Replace those, adjust the linker script/bootloader
 offset, and the rest (USB, scan engine, estimators, protocol) is reusable.
 Details and a checklist: [`docs/porting.md`](docs/porting.md).
-
-## Provenance
-
-Extracted and rewritten from `hs611-fw`'s `src/min/` (`usb_min.c`,
-`acq_timed.c`, `debug_proto.h`) plus the shared AFE (`src/acq.c`,
-`src/tables.c`) and USB hardware layer (`src/usb_hw.c`, `src/usb_it.c`). The
-acquisition and estimator maths are preserved; the code has been split into
-named modules, the build-variant `#ifdef`s removed, and the protocol bumped to
-version 6 (see `docs/protocol.md`).
